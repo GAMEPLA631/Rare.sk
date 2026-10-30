@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RARE LABS • Cloud Vault & Stream</title>
+    
+    <!-- Paho MQTT knižnica -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    
+    <!-- Architektonické moderné písma -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-black: #000000;
+            --bg-surface: #0a0a0a;
+            --bg-card: #121212;
+            --bg-card-hover: #171717;
+            --border-color: #242424;
+            --border-subtle: #1a1a1a;
+            --text-white: #ffffff;
+            --text-muted: #888888;
+            --text-dim: #555555;
+            --accent: #ffffff;
+            --radius-box: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Dekoratívne bodkované matrice z Webnode predlohy */
+        .dots-pattern-top {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            width: 90px;
+            height: 90px;
+            background-image: radial-gradient(#333 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.7;
+        }
+
+        .dots-pattern-bottom {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            width: 120px;
+            height: 80px;
+            background-image: radial-gradient(#333 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.7;
+        }
+
+        /* Horná Webnode Navigácia */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--text-white);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #0f1a14;
+            color: #10b981;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid #1f3b2c;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        /* HERO SEKCIA – Architektúra podľa obrázka */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 72vh;
+            min-height: 520px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 90%, #000 100%),
+                        url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
+            display: flex;
+            align-items: flex-end;
+            padding: 4rem 5%;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-text-box {
+            max-width: 900px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-text-box .sub-title {
+            font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #d1d5db;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .hero-text-box .main-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.3rem, 5vw, 4.4rem);
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-top: 0.3rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        /* Stredná sekcia (RARE LABS INC. štýl) */
+        .intro-section {
+            max-width: 850px;
+            margin: 4.5rem auto 3rem;
+            text-align: center;
+            padding: 0 1.5rem;
+        }
+
+        .intro-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            font-weight: 700;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            color: #ffffff;
+        }
+
+        .intro-caption {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-dim);
+            margin-bottom: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .intro-paragraph {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        /* Formulár na zverejnenie v čiernom štýle */
+        .publish-container {
+            max-width: 820px;
+            margin: 0 auto 5rem;
+            padding: 0 1.5rem;
+        }
+
+        .publish-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-box);
+            padding: 2.2rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .input-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            background: #080808;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-white);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #555555;
+            background: #0e0e0e;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            background: #ffffff;
+            color: #000000;
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 1.1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: #e2e2e2;
+            transform: translateY(-2px);
+        }
+
+        /* Sekcie */
+        .section-wrap {
+            max-width: 1180px;
+            margin: 0 auto 5rem;
+            padding: 0 2rem;
+        }
+
+        .section-title-bar {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .section-title-bar h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-white);
+        }
+
+        .section-title-bar span {
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* ZLOŽKA: Obrovské Texty (Black monolith style) */
+        .massive-text-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid #ffffff;
+            border-radius: var(--radius-box);
+            padding: 3rem 2.5rem;
+            margin-bottom: 2rem;
+            transition: border-color 0.2s;
+        }
+
+        .massive-text-card:hover {
+            border-color: #444;
+            border-left-color: #ffffff;
+        }
+
+        .huge-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            word-break: break-word;
+        }
+
+        .huge-body {
+            font-size: 1.15rem;
+            color: #b0b0b0;
+            white-space: pre-line;
+            line-height: 1.8;
+            max-width: 950px;
+        }
+
+        .huge-meta {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* GRID PRE YOUTUBE VIDEÁ */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2.2rem;
+        }
+
+        .video-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-box);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s, border-color 0.25s;
+        }
+
+        .video-box:hover {
+            transform: translateY(-4px);
+            border-color: #444;
+        }
+
+        .video-iframe-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 pomer */
+            background: #000000;
+        }
+
+        .video-iframe-wrap iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-meta-box {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.6rem;
+            line-height: 1.35;
+        }
+
+        .video-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .video-foot {
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            border-top: 1px solid #1a1a1a;
+            padding-top: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            text-transform: uppercase;
+        }
+
+        /* Podpis v štýle predlohy */
+        .signature-box {
+            text-align: center;
+            margin: 5rem 0 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .signature-svg {
+            width: 150px;
+            opacity: 0.8;
+            filter: invert(1);
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem 1.5rem; }
+            .nav-menu { display: none; }
+            .hero-banner { height: 60vh; padding: 2rem 1.5rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .btn-submit, .input-group.full { grid-column: span 1; }
+            .massive-text-card { padding: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dekoratívne bodky z Webnode šablóny -->
+    <div class="dots-pattern-top"></div>
+    <div class="dots-pattern-bottom"></div>
+
+    <!-- Horná Navigácia (Webnode Čierny minimalizmus) -->
+    <header>
+        <div class="nav-logo">
+            <span>RARE LABS INC.</span>
+            <div id="cloudStatus" class="status-badge">
+                <span class="status-dot"></span>
+                <span>EMQX Spájanie...</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="active">HOME</a>
+            <a href="#textsSection">ZLOŽKA TEXTOV</a>
+            <a href="#videosSection">VIDEÁ</a>
+            <a href="#publishSection">PRIDAŤ</a>
+        </nav>
+    </header>
+
+    <!-- HERO SEKCIA s nočnou panorámou architektúry podľa obrázka -->
+    <section class="hero-banner">
+        <div class="hero-text-box">
+            <div class="sub-title">SOLUTIONS FOR</div>
+            <div class="main-title">URBAN &amp; LANDSCAPE<br>ARCHITECTURE</div>
+        </div>
+    </section>
+
+    <!-- STREDNÁ SEKCIA: RARE LABS INC. (Editorial Layout) -->
+    <section class="intro-section">
+        <h1 class="intro-title">RARE LABS INC.</h1>
+        <p class="intro-caption">Verejná synchronizovaná cloudová databáza a bezreklamový streaming</p>
+        <p class="intro-paragraph">
+            Všetok zverejnený obsah sa v reálnom čase natrvalo ukladá v globálnom MQTT brokere <strong>EMQX Cloud</strong> cez perzistentné topics (retained). Každý návštevník okamžite vidí rovnaký aktuálny stav.
+        </p>
+    </section>
+
+    <!-- FORMULÁR NA PUBLIKOVANIE DO CLOUDU -->
+    <div class="publish-container" id="publishSection">
+        <div class="publish-card">
+            <form id="publishForm">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Typ záznamu</label>
+                        <select id="itemType" onchange="toggleFormInputs()">
+                            <option value="video">YouTube Video (Bez reklám)</option>
+                            <option value="massive_text">Zložka: Obrovský architektonický text</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Názov / Headline</label>
+                        <input type="text" id="itemTitle" placeholder="Zadajte názov..." required>
+                    </div>
+
+                    <div class="input-group full" id="youtubeInputGroup">
+                        <label>YouTube URL adresa</label>
+                        <input type="url" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=... alebo youtu.be/...">
+                    </div>
+
+                    <div class="input-group full">
+                        <label>Obsah / Obrovský Text v zložke</label>
+                        <textarea id="itemContent" placeholder="Sem vložte text. Pri voľbe 'Zložka' sa zobrazí v obrovskom formáte..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">Verejne Publikovať do Cloudu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ZLOŽKA S OBROVSKÝMI TEXTAMI -->
+    <section class="section-wrap" id="textsSection">
+        <div class="section-title-bar">
+            <h2>Zložka: Obrovské Texty</h2>
+            <span>Archive Directory</span>
+        </div>
+        <div id="massiveTextsContainer">
+            <!-- Dynamické generovanie z cloudu -->
+        </div>
+    </section>
+
+    <!-- ZOZNAM YOUTUBE VIDEÍ (BEZ REKLÁM) -->
+    <section class="section-wrap" id="videosSection">
+        <div class="section-title-bar">
+            <h2>Verejné Videá</h2>
+            <span>Ad-free Stream</span>
+        </div>
+        <div class="videos-grid" id="videosGrid">
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 3rem;">
+                Načítavam katalóg z EMQX Cloudu...
+            </div>
+        </div>
+    </section>
+
+    <!-- Webnode Podpis z predlohy -->
+    <div class="signature-box">
+        <svg class="signature-svg" viewBox="0 0 200 80" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10,50 Q40,10 60,40 T90,30 T130,50 Q160,20 180,45 M60,35 L65,70 M120,40 Q140,65 170,55" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- EMQX MQTT JAVASCRIPT ENGINE (100% zachovaná funkčnosť) -->
+    <script>
+        // --- 1. MQTT ARCHITEKTÚRA (EMQX WSS) ---
+        const BROKER_HOST = "broker.emqx.io";
+        const BROKER_PORT = 8084; // Secure WebSockets (WSS)
+        const BROKER_PATH = "/mqtt";
+        const CLIENT_ID = "rare_web_" + Math.random().toString(16).substring(2, 10);
+
+        // Perzistentné Topics
+        const TOPIC_VAULT = "dankermax/v1/vault_catalog";
+        const TOPIC_USERS = "dankermax/v1/users_registry";
+        const TOPIC_REPORTS = "dankermax/v1/reports_queue";
+
+        let catalog = [];
+
+        // Inicializácia Paho MQTT klienta
+        const client = new Paho.MQTT.Client(BROKER_HOST, BROKER_PORT, BROKER_PATH, CLIENT_ID);
+
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+
+        connectMQTT();
+
+        function connectMQTT() {
+            const options = {
+                useSSL: true,
+                timeout: 5,
+                keepAliveInterval: 30,
+                cleanSession: false,
+                onSuccess: onConnectSuccess,
+                onFailure: onConnectFailure
+            };
+            client.connect(options);
+        }
+
+        function onConnectSuccess() {
+            console.log(" Pripojené k EMQX Broker cez WSS!");
+            updateStatusBadge(true);
+
+            // Odber s perzistenciou (retained = true)
+            client.subscribe(TOPIC_VAULT, { qos: 1 });
+            registerUserPresence();
+        }
+
+        function onConnectFailure(err) {
+            console.error(" Chyba pripojenia:", err);
+            updateStatusBadge(false);
+            setTimeout(connectMQTT, 5000);
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.warn(" Spojenie s brokerom stratené:", responseObject.errorMessage);
+                updateStatusBadge(false);
+                setTimeout(connectMQTT, 4000);
+            }
+        }
+
+        function onMessageArrived(message) {
+            if (message.destinationName === TOPIC_VAULT) {
+                try {
+                    const data = JSON.parse(message.payloadString);
+                    if (Array.isArray(data)) {
+                        catalog = data;
+                        localStorage.setItem("dankermax_catalog", JSON.stringify(catalog));
+                        renderCatalog();
+                    }
+                } catch (e) {
+                    console.error("Chyba spracovania JSON:", e);
+                }
+            }
+        }
+
+        function publishCatalogToCloud() {
+            const payload = JSON.stringify(catalog);
+            const message = new Paho.MQTT.Message(payload);
+            message.destinationName = TOPIC_VAULT;
+            message.qos = 1;
+            message.retained = true; // Zostáva natrvalo v cloude!
+            client.send(message);
+
+            localStorage.setItem("dankermax_catalog", payload);
+        }
+
+        function registerUserPresence() {
+            const userPayload = JSON.stringify({
+                clientId: CLIENT_ID,
+                role: "public_guest",
+                timestamp: new Date().toISOString()
+            });
+            const msg = new Paho.MQTT.Message(userPayload);
+            msg.destinationName = TOPIC_USERS;
+            msg.qos = 0;
+            client.send(msg);
+        }
+
+        function updateStatusBadge(isOnline) {
+            const badge = document.getElementById("cloudStatus");
+            if (isOnline) {
+                badge.style.background = "#0f1a14";
+                badge.style.color = "#10b981";
+                badge.style.borderColor = "#1f3b2c";
+                badge.innerHTML = `<span class="status-dot"></span><span>EMQX Live</span>`;
+            } else {
+                badge.style.background = "#1a0f0f";
+                badge.style.color = "#ef4444";
+                badge.style.borderColor = "#3b1f1f";
+                badge.innerHTML = `<span class="status-dot" style="background:#ef4444"></span><span>Offline</span>`;
+            }
+        }
+
+        // --- 2. YOUTUBE PARSER A PUBLIKOVANIE ---
+        function extractYouTubeID(url) {
+            if (!url) return null;
+            const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : null;
+        }
+
+        function toggleFormInputs() {
+            const type = document.getElementById("itemType").value;
+            const ytGroup = document.getElementById("youtubeInputGroup");
+            if (type === "video") {
+                ytGroup.style.display = "flex";
+                document.getElementById("youtubeUrl").setAttribute("required", "true");
+            } else {
+                ytGroup.style.display = "none";
+                document.getElementById("youtubeUrl").removeAttribute("required");
+            }
+        }
+
+        document.getElementById("publishForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const type = document.getElementById("itemType").value;
+            const title = document.getElementById("itemTitle").value.trim();
+            const content = document.getElementById("itemContent").value.trim();
+            const ytUrl = document.getElementById("youtubeUrl").value.trim();
+
+            let videoId = null;
+            if (type === "video") {
+                videoId = extractYouTubeID(ytUrl);
+                if (!videoId) {
+                    alert("Zadajte prosím platnú YouTube URL adresu!");
+                    return;
+                }
+            }
+
+            const newItem = {
+                id: "item_" + Date.now(),
+                type: type,
+                title: title,
+                content: content,
+                youtubeId: videoId,
+                tier: "free",
+                timestamp: new Date().toLocaleDateString('sk-SK') + " " + new Date().toLocaleTimeString('sk-SK', {hour: '2-digit', minute:'2-digit'})
+            };
+
+            catalog.unshift(newItem);
+            publishCatalogToCloud();
+            renderCatalog();
+
+            this.reset();
+            toggleFormInputs();
+        });
+
+        // --- 3. RENDEROVANIE OBSAHU ---
+        function renderCatalog() {
+            const massiveContainer = document.getElementById("massiveTextsContainer");
+            const videosGrid = document.getElementById("videosGrid");
+
+            massiveContainer.innerHTML = "";
+            videosGrid.innerHTML = "";
+
+            const massiveItems = catalog.filter(i => i.type === "massive_text");
+            const videoItems = catalog.filter(i => i.type === "video");
+
+            // Obrovské texty
+            if (massiveItems.length === 0) {
+                massiveContainer.innerHTML = `
+                    <div style="background:var(--bg-card); padding:2.5rem; border-radius:12px; border:1px solid var(--border-color); text-align:center; color:var(--text-dim); font-size:0.9rem;">
+                        V zložke sa zatiaľ nenachádzajú žiadne textové záznamy.
+                    </div>
+                `;
+            } else {
+                massiveItems.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "massive-text-card";
+                    card.innerHTML = `
+                        <div class="huge-heading">${escapeHtml(item.title)}</div>
+                        <div class="huge-body">${escapeHtml(item.content)}</div>
+                        <div class="huge-meta">ARCHÍV ID: ${item.id} • DÁTUM: ${item.timestamp}</div>
+                    `;
+                    massiveContainer.appendChild(card);
+                });
+            }
+
+            // Videá bez reklám (youtube-nocookie)
+            if (videoItems.length === 0) {
+                videosGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 3rem;">
+                        Žiadne zverejnené videá v cloude.
+                    </div>
+                `;
+            } else {
+                videoItems.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "video-box";
+                    
+                    // Bez reklám a sledovania cez youtube-nocookie
+                    const embedUrl = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?rel=0&modestbranding=1&enablejsapi=1`;
+
+                    card.innerHTML = `
+                        <div class="video-iframe-wrap">
+                            <iframe 
+                                src="${embedUrl}" 
+                                title="${escapeHtml(item.title)}" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-meta-box">
+                            <div>
+                                <h3 class="video-title">${escapeHtml(item.title)}</h3>
+                                <p class="video-desc">${escapeHtml(item.content || "Bez popisu.")}</p>
+                            </div>
+                            <div class="video-foot">
+                                <span>PUBLIC ARCHIVE</span>
+                                <span>${item.timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                    videosGrid.appendChild(card);
+                });
+            }
+        }
+
+        function escapeHtml(string) {
+            if (!string) return "";
+            return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    '/': '&#x2F;',
+                    '`': '&#x60;',
+                    '=': '&#x3D;'
+                })[s];
+            });
+        }
+
+        // Lokálna záloha pri štarte
+        const cached = localStorage.getItem("dankermax_catalog");
+        if (cached) {
+            try {
+                catalog = JSON.parse(cached);
+                renderCatalog();
+            } catch (e) {}
+        }
+    </script>
+</body>
+</html>
