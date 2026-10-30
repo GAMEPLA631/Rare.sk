@@ -25,6 +25,7 @@
             --text-muted: #888888;
             --text-dim: #555555;
             --accent: #ffffff;
+            --danger: #ef4444;
             --radius-box: 12px;
         }
 
@@ -71,7 +72,7 @@
             opacity: 0.7;
         }
 
-        /* Horná Webnode Navigácia */
+        /* Horná Navigácia */
         header {
             position: sticky;
             top: 0;
@@ -99,7 +100,7 @@
 
         .nav-menu {
             display: flex;
-            gap: 2.2rem;
+            gap: 2rem;
             align-items: center;
         }
 
@@ -115,6 +116,31 @@
 
         .nav-menu a:hover, .nav-menu a.active {
             color: var(--text-white);
+        }
+
+        .nav-auth-btn {
+            background: #ffffff;
+            color: #000000 !important;
+            padding: 0.45rem 1rem;
+            border-radius: 4px;
+            font-size: 0.75rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s ease;
+        }
+
+        .nav-auth-btn:hover {
+            background: #d4d4d4;
+        }
+
+        .user-tag {
+            color: #10b981;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         .status-badge {
@@ -146,7 +172,7 @@
             100% { transform: scale(0.9); opacity: 0.7; }
         }
 
-        /* HERO SEKCIA – Architektúra podľa obrázka */
+        /* HERO SEKCIA */
         .hero-banner {
             position: relative;
             width: 100%;
@@ -186,7 +212,7 @@
             text-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
 
-        /* Stredná sekcia (RARE LABS INC. štýl) */
+        /* Stredná sekcia */
         .intro-section {
             max-width: 850px;
             margin: 4.5rem auto 3rem;
@@ -220,7 +246,7 @@
             font-weight: 400;
         }
 
-        /* Formulár na zverejnenie v čiernom štýle */
+        /* Formulár na publikovanie */
         .publish-container {
             max-width: 820px;
             margin: 0 auto 5rem;
@@ -335,7 +361,7 @@
             text-transform: uppercase;
         }
 
-        /* ZLOŽKA: Obrovské Texty (Black monolith style) */
+        /* Zložka: Obrovské texty */
         .massive-text-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -343,12 +369,7 @@
             border-radius: var(--radius-box);
             padding: 3rem 2.5rem;
             margin-bottom: 2rem;
-            transition: border-color 0.2s;
-        }
-
-        .massive-text-card:hover {
-            border-color: #444;
-            border-left-color: #ffffff;
+            position: relative;
         }
 
         .huge-heading {
@@ -377,9 +398,12 @@
             letter-spacing: 1.5px;
             color: var(--text-dim);
             text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* GRID PRE YOUTUBE VIDEÁ */
+        /* GRID PRE YOUTUBE VIDEÁ (KLIKACIE NÁHĽADY) */
         .videos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -393,28 +417,68 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
             transition: transform 0.25s, border-color 0.25s;
+            position: relative;
         }
 
         .video-box:hover {
             transform: translateY(-4px);
-            border-color: #444;
+            border-color: #666;
         }
 
-        .video-iframe-wrap {
+        .video-thumb-wrap {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 pomer */
-            background: #000000;
+            padding-top: 56.25%; /* 16:9 */
+            background: #000;
+            overflow: hidden;
         }
 
-        .video-iframe-wrap iframe {
+        .video-thumb-img {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .video-box:hover .video-thumb-img {
+            transform: scale(1.05);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 58px;
+            height: 58px;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .video-box:hover .play-overlay {
+            background: #ffffff;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .play-overlay svg {
+            width: 22px;
+            height: 22px;
+            fill: #ffffff;
+            margin-left: 3px;
+        }
+
+        .video-box:hover .play-overlay svg {
+            fill: #000000;
         }
 
         .video-meta-box {
@@ -448,10 +512,158 @@
             padding-top: 0.8rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             text-transform: uppercase;
         }
 
-        /* Podpis v štýle predlohy */
+        /* Tlačidlo na vymazanie */
+        .btn-delete {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        /* POPUP MODAL S TAPETOU PRE PRIHLÁSENIE / REGISTRÁCIU */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .auth-modal {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            /* Tapeta v pozadí prihlasovania a registrácie */
+            background: linear-gradient(180deg, rgba(8, 8, 8, 0.88) 0%, rgba(0, 0, 0, 0.95) 100%),
+                        url('https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80') center center / cover no-repeat;
+            padding: 3rem 2.5rem;
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.4rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .auth-close:hover {
+            color: #fff;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #222;
+            padding-bottom: 0.8rem;
+        }
+
+        .auth-tab {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .auth-tab.active {
+            color: #ffffff;
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 0.7rem;
+            margin-bottom: -0.9rem;
+        }
+
+        /* MODAL PRE YOUTUBE FRAME (LIGHTBOX) */
+        .video-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .video-frame-container {
+            position: relative;
+            width: 100%;
+            max-width: 960px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: var(--radius-box);
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        .video-frame-responsive {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 */
+        }
+
+        .video-frame-responsive iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-modal-close {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            color: #fff;
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Podpis */
         .signature-box {
             text-align: center;
             margin: 5rem 0 3rem;
@@ -467,21 +679,21 @@
 
         @media (max-width: 768px) {
             header { padding: 1rem 1.5rem; }
-            .nav-menu { display: none; }
+            .nav-menu { gap: 1rem; }
             .hero-banner { height: 60vh; padding: 2rem 1.5rem; }
             .form-grid { grid-template-columns: 1fr; }
             .btn-submit, .input-group.full { grid-column: span 1; }
             .massive-text-card { padding: 1.8rem; }
+            .auth-modal { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Dekoratívne bodky z Webnode šablóny -->
     <div class="dots-pattern-top"></div>
     <div class="dots-pattern-bottom"></div>
 
-    <!-- Horná Navigácia (Webnode Čierny minimalizmus) -->
+    <!-- Horná Navigácia -->
     <header>
         <div class="nav-logo">
             <span>RARE LABS INC.</span>
@@ -491,14 +703,16 @@
             </div>
         </div>
         <nav class="nav-menu">
-            <a href="#" class="active">HOME</a>
+            <a href="#">HOME</a>
             <a href="#textsSection">ZLOŽKA TEXTOV</a>
             <a href="#videosSection">VIDEÁ</a>
-            <a href="#publishSection">PRIDAŤ</a>
+            <div id="userNavSection">
+                <button class="nav-auth-btn" onclick="openAuthModal('login')">PRIHLÁSIŤ SA</button>
+            </div>
         </nav>
     </header>
 
-    <!-- HERO SEKCIA s nočnou panorámou architektúry podľa obrázka -->
+    <!-- HERO SEKCIA -->
     <section class="hero-banner">
         <div class="hero-text-box">
             <div class="sub-title">SOLUTIONS FOR</div>
@@ -506,16 +720,16 @@
         </div>
     </section>
 
-    <!-- STREDNÁ SEKCIA: RARE LABS INC. (Editorial Layout) -->
+    <!-- STREDNÁ SEKCIA: RARE LABS INC. -->
     <section class="intro-section">
         <h1 class="intro-title">RARE LABS INC.</h1>
         <p class="intro-caption">Verejná synchronizovaná cloudová databáza a bezreklamový streaming</p>
         <p class="intro-paragraph">
-            Všetok zverejnený obsah sa v reálnom čase natrvalo ukladá v globálnom MQTT brokere <strong>EMQX Cloud</strong> cez perzistentné topics (retained). Každý návštevník okamžite vidí rovnaký aktuálny stav.
+            Všetok zverejnený obsah aj vytvorené účty sa v reálnom čase natrvalo ukladajú v globálnom brokere <strong>EMQX Cloud</strong> cez perzistentné topics. Prihláste sa na akomkoľvek zariadení a spravujte svoj obsah.
         </p>
     </section>
 
-    <!-- FORMULÁR NA PUBLIKOVANIE DO CLOUDU -->
+    <!-- FORMULÁR NA PUBLIKOVANIE -->
     <div class="publish-container" id="publishSection">
         <div class="publish-card">
             <form id="publishForm">
@@ -523,7 +737,7 @@
                     <div class="input-group">
                         <label>Typ záznamu</label>
                         <select id="itemType" onchange="toggleFormInputs()">
-                            <option value="video">YouTube Video (Bez reklám)</option>
+                            <option value="video">YouTube Video (Frame Prehrávač)</option>
                             <option value="massive_text">Zložka: Obrovský architektonický text</option>
                         </select>
                     </div>
@@ -555,16 +769,14 @@
             <h2>Zložka: Obrovské Texty</h2>
             <span>Archive Directory</span>
         </div>
-        <div id="massiveTextsContainer">
-            <!-- Dynamické generovanie z cloudu -->
-        </div>
+        <div id="massiveTextsContainer"></div>
     </section>
 
-    <!-- ZOZNAM YOUTUBE VIDEÍ (BEZ REKLÁM) -->
+    <!-- ZOZNAM YOUTUBE VIDEÍ (KLIKNI PRE FRAME) -->
     <section class="section-wrap" id="videosSection">
         <div class="section-title-bar">
             <h2>Verejné Videá</h2>
-            <span>Ad-free Stream</span>
+            <span>Kliknite pre otvorenie vo Frame bez reklám</span>
         </div>
         <div class="videos-grid" id="videosGrid">
             <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 3rem;">
@@ -573,29 +785,82 @@
         </div>
     </section>
 
-    <!-- Webnode Podpis z predlohy -->
+    <!-- Podpis -->
     <div class="signature-box">
         <svg class="signature-svg" viewBox="0 0 200 80" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10,50 Q40,10 60,40 T90,30 T130,50 Q160,20 180,45 M60,35 L65,70 M120,40 Q140,65 170,55" stroke-linecap="round"/>
         </svg>
     </div>
 
-    <!-- EMQX MQTT JAVASCRIPT ENGINE (100% zachovaná funkčnosť) -->
+    <!-- MODAL S TAPETOU PRE PRIHLÁSENIE / REGISTRÁCIU -->
+    <div class="auth-overlay" id="authOverlay" onclick="closeAuthOnBackdrop(event)">
+        <div class="auth-modal" id="authModalBox">
+            <button class="auth-close" onclick="closeAuthModal()">&times;</button>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Prihlásenie</div>
+                <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrácia</div>
+            </div>
+
+            <!-- Formulár Prihlásenia -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group" style="margin-bottom: 1.2rem;">
+                    <label>Používateľské meno</label>
+                    <input type="text" id="loginUsername" required placeholder="Zadajte prihlasovacie meno">
+                </div>
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label>Heslo</label>
+                    <input type="password" id="loginPassword" required placeholder="Zadajte heslo">
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">Prihlásiť sa do Cloudu</button>
+            </form>
+
+            <!-- Formulár Registrácie -->
+            <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+                <div class="input-group" style="margin-bottom: 1.2rem;">
+                    <label>Zvoľte si meno</label>
+                    <input type="text" id="regUsername" required placeholder="Vaše nové meno">
+                </div>
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label>Zvoľte si heslo</label>
+                    <input type="password" id="regPassword" required placeholder="Minimálne 4 znaky">
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">Vytvoriť Cloud Účet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL OKNO S FRAME (LIGHTBOX PRE YOUTUBE VIDEO) -->
+    <div class="video-modal-overlay" id="videoModal" onclick="closeVideoModalOnBackdrop(event)">
+        <div class="video-frame-container">
+            <button class="video-modal-close" onclick="closeVideoModal()">&times;</button>
+            <div class="video-frame-responsive">
+                <iframe id="modalIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMQX MQTT + APLIKAČNÝ JAVASCRIPT -->
     <script>
-        // --- 1. MQTT ARCHITEKTÚRA (EMQX WSS) ---
+        // --- 1. MQTT ARCHITEKTÚRA ---
         const BROKER_HOST = "broker.emqx.io";
-        const BROKER_PORT = 8084; // Secure WebSockets (WSS)
+        const BROKER_PORT = 8084;
         const BROKER_PATH = "/mqtt";
         const CLIENT_ID = "rare_web_" + Math.random().toString(16).substring(2, 10);
 
-        // Perzistentné Topics
         const TOPIC_VAULT = "dankermax/v1/vault_catalog";
         const TOPIC_USERS = "dankermax/v1/users_registry";
         const TOPIC_REPORTS = "dankermax/v1/reports_queue";
 
         let catalog = [];
+        let usersRegistry = [];
+        let currentUser = null;
 
-        // Inicializácia Paho MQTT klienta
+        // Načítaj prihláseného používateľa z pamäte
+        const savedUser = localStorage.getItem("dankermax_session_user");
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+        }
+
         const client = new Paho.MQTT.Client(BROKER_HOST, BROKER_PORT, BROKER_PATH, CLIENT_ID);
 
         client.onConnectionLost = onConnectionLost;
@@ -604,24 +869,24 @@
         connectMQTT();
 
         function connectMQTT() {
-            const options = {
+            client.connect({
                 useSSL: true,
                 timeout: 5,
                 keepAliveInterval: 30,
                 cleanSession: false,
                 onSuccess: onConnectSuccess,
                 onFailure: onConnectFailure
-            };
-            client.connect(options);
+            });
         }
 
         function onConnectSuccess() {
             console.log(" Pripojené k EMQX Broker cez WSS!");
             updateStatusBadge(true);
 
-            // Odber s perzistenciou (retained = true)
+            // Odber katalógu a používateľskej databázy
             client.subscribe(TOPIC_VAULT, { qos: 1 });
-            registerUserPresence();
+            client.subscribe(TOPIC_USERS, { qos: 1 });
+            updateUserNav();
         }
 
         function onConnectFailure(err) {
@@ -632,13 +897,14 @@
 
         function onConnectionLost(responseObject) {
             if (responseObject.errorCode !== 0) {
-                console.warn(" Spojenie s brokerom stratené:", responseObject.errorMessage);
+                console.warn(" Spojenie stratené:", responseObject.errorMessage);
                 updateStatusBadge(false);
                 setTimeout(connectMQTT, 4000);
             }
         }
 
         function onMessageArrived(message) {
+            // Katalóg videí a textov
             if (message.destinationName === TOPIC_VAULT) {
                 try {
                     const data = JSON.parse(message.payloadString);
@@ -648,7 +914,19 @@
                         renderCatalog();
                     }
                 } catch (e) {
-                    console.error("Chyba spracovania JSON:", e);
+                    console.error("Chyba spracovania katalógu:", e);
+                }
+            }
+            // Globálna databáza účtov
+            else if (message.destinationName === TOPIC_USERS) {
+                try {
+                    const users = JSON.parse(message.payloadString);
+                    if (Array.isArray(users)) {
+                        usersRegistry = users;
+                        localStorage.setItem("dankermax_users_registry", JSON.stringify(usersRegistry));
+                    }
+                } catch (e) {
+                    console.error("Chyba spracovania používateľov:", e);
                 }
             }
         }
@@ -658,22 +936,19 @@
             const message = new Paho.MQTT.Message(payload);
             message.destinationName = TOPIC_VAULT;
             message.qos = 1;
-            message.retained = true; // Zostáva natrvalo v cloude!
+            message.retained = true; // Zostáva natrvalo v cloude
             client.send(message);
-
             localStorage.setItem("dankermax_catalog", payload);
         }
 
-        function registerUserPresence() {
-            const userPayload = JSON.stringify({
-                clientId: CLIENT_ID,
-                role: "public_guest",
-                timestamp: new Date().toISOString()
-            });
-            const msg = new Paho.MQTT.Message(userPayload);
-            msg.destinationName = TOPIC_USERS;
-            msg.qos = 0;
-            client.send(msg);
+        function publishUsersToCloud() {
+            const payload = JSON.stringify(usersRegistry);
+            const message = new Paho.MQTT.Message(payload);
+            message.destinationName = TOPIC_USERS;
+            message.qos = 1;
+            message.retained = true; // Účty natrvalo uložené pre akékoľvek zariadenie
+            client.send(message);
+            localStorage.setItem("dankermax_users_registry", payload);
         }
 
         function updateStatusBadge(isOnline) {
@@ -691,7 +966,150 @@
             }
         }
 
-        // --- 2. YOUTUBE PARSER A PUBLIKOVANIE ---
+        // --- 2. PRIHLASOVANIE & REGISTRÁCIA (CLOUD AUTH) ---
+        function openAuthModal(tab) {
+            document.getElementById("authOverlay").style.display = "flex";
+            switchAuthTab(tab || 'login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById("authOverlay").style.display = "none";
+        }
+
+        function closeAuthOnBackdrop(e) {
+            if (e.target.id === "authOverlay") closeAuthModal();
+        }
+
+        function switchAuthTab(tab) {
+            const tabL = document.getElementById("tabLogin");
+            const tabR = document.getElementById("tabRegister");
+            const formL = document.getElementById("loginForm");
+            const formR = document.getElementById("registerForm");
+
+            if (tab === 'login') {
+                tabL.classList.add("active");
+                tabR.classList.remove("active");
+                formL.style.display = "block";
+                formR.style.display = "none";
+            } else {
+                tabR.classList.add("active");
+                tabL.classList.remove("active");
+                formR.style.display = "block";
+                formL.style.display = "none";
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const u = document.getElementById("regUsername").value.trim();
+            const p = document.getElementById("regPassword").value.trim();
+
+            if (u.length < 3 || p.length < 4) {
+                alert("Meno musí mať aspoň 3 a heslo 4 znaky!");
+                return;
+            }
+
+            // Kontrola či používateľ existuje v cloude
+            const exists = usersRegistry.find(user => user.username.toLowerCase() === u.toLowerCase());
+            if (exists) {
+                alert("Používateľ s týmto menom už existuje v cloude!");
+                return;
+            }
+
+            const newUser = {
+                id: "user_" + Date.now(),
+                username: u,
+                password: p,
+                createdAt: new Date().toISOString()
+            };
+
+            usersRegistry.push(newUser);
+            publishUsersToCloud();
+
+            // Automatické prihlásenie
+            currentUser = { id: newUser.id, username: newUser.username };
+            localStorage.setItem("dankermax_session_user", JSON.stringify(currentUser));
+            updateUserNav();
+            renderCatalog();
+            closeAuthModal();
+            alert("Účet bol úspešne zaregistrovaný v cloude a ste prihlásený!");
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById("loginUsername").value.trim();
+            const p = document.getElementById("loginPassword").value.trim();
+
+            const found = usersRegistry.find(user => user.username.toLowerCase() === u.toLowerCase() && user.password === p);
+
+            if (found) {
+                currentUser = { id: found.id, username: found.username };
+                localStorage.setItem("dankermax_session_user", JSON.stringify(currentUser));
+                updateUserNav();
+                renderCatalog();
+                closeAuthModal();
+            } else {
+                alert("Nesprávne používateľské meno alebo heslo!");
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem("dankermax_session_user");
+            updateUserNav();
+            renderCatalog();
+        }
+
+        function updateUserNav() {
+            const navSection = document.getElementById("userNavSection");
+            if (currentUser) {
+                navSection.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span class="user-tag">● ${escapeHtml(currentUser.username)}</span>
+                        <button class="nav-auth-btn" style="background:#222; color:#fff !important;" onclick="handleLogout()">ODHLÁSIŤ</button>
+                    </div>
+                `;
+            } else {
+                navSection.innerHTML = `
+                    <button class="nav-auth-btn" onclick="openAuthModal('login')">PRIHLÁSIŤ SA</button>
+                `;
+            }
+        }
+
+        // --- 3. VYMAZÁVANIE ZVEREJNENÉHO OBSAHU ---
+        function deleteItem(itemId) {
+            if (!confirm("Naozaj chcete zmazať tento príspevok z cloudu?")) return;
+
+            // Vymaž z poľa
+            catalog = catalog.filter(item => item.id !== itemId);
+            // Okamžite zosynchronizuj cez retained do celého sveta
+            publishCatalogToCloud();
+            renderCatalog();
+        }
+
+        // --- 4. OTVORENIE VIDEA VO FRAME (LIGHTBOX) ---
+        function openVideoModal(youtubeId) {
+            const modal = document.getElementById("videoModal");
+            const iframe = document.getElementById("modalIframe");
+            // youtube-nocookie bez reklám, autoplay po otvorení
+            iframe.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+            modal.style.display = "flex";
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById("videoModal");
+            const iframe = document.getElementById("modalIframe");
+            iframe.src = ""; // zastaví prehrávanie videa
+            modal.style.display = "none";
+        }
+
+        function closeVideoModalOnBackdrop(e) {
+            if (e.target.id === "videoModal") {
+                closeVideoModal();
+            }
+        }
+
+        // --- 5. PUBLIKOVANIE NOVÉHO OBSAHU ---
         function extractYouTubeID(url) {
             if (!url) return null;
             const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
@@ -728,12 +1146,17 @@
                 }
             }
 
+            const authorName = currentUser ? currentUser.username : "Verejný hosť";
+            const authorId = currentUser ? currentUser.id : "guest";
+
             const newItem = {
                 id: "item_" + Date.now(),
                 type: type,
                 title: title,
                 content: content,
                 youtubeId: videoId,
+                author: authorName,
+                authorId: authorId,
                 tier: "free",
                 timestamp: new Date().toLocaleDateString('sk-SK') + " " + new Date().toLocaleTimeString('sk-SK', {hour: '2-digit', minute:'2-digit'})
             };
@@ -746,7 +1169,7 @@
             toggleFormInputs();
         });
 
-        // --- 3. RENDEROVANIE OBSAHU ---
+        // --- 6. RENDEROVANIE OBSAHU ---
         function renderCatalog() {
             const massiveContainer = document.getElementById("massiveTextsContainer");
             const videosGrid = document.getElementById("videosGrid");
@@ -757,7 +1180,7 @@
             const massiveItems = catalog.filter(i => i.type === "massive_text");
             const videoItems = catalog.filter(i => i.type === "video");
 
-            // Obrovské texty
+            // 1. Obrovské texty
             if (massiveItems.length === 0) {
                 massiveContainer.innerHTML = `
                     <div style="background:var(--bg-card); padding:2.5rem; border-radius:12px; border:1px solid var(--border-color); text-align:center; color:var(--text-dim); font-size:0.9rem;">
@@ -768,16 +1191,23 @@
                 massiveItems.forEach(item => {
                     const card = document.createElement("div");
                     card.className = "massive-text-card";
+
+                    // Môže vymazať autor príspevku alebo prihlásený správca
+                    const canDelete = currentUser && (currentUser.id === item.authorId || currentUser.username === item.author || !item.authorId);
+
                     card.innerHTML = `
                         <div class="huge-heading">${escapeHtml(item.title)}</div>
                         <div class="huge-body">${escapeHtml(item.content)}</div>
-                        <div class="huge-meta">ARCHÍV ID: ${item.id} • DÁTUM: ${item.timestamp}</div>
+                        <div class="huge-meta">
+                            <span>AUTOR: ${escapeHtml(item.author || "Verejný hosť")} • DÁTUM: ${item.timestamp}</span>
+                            ${canDelete ? `<button class="btn-delete" onclick="deleteItem('${item.id}')">Zmazať</button>` : ''}
+                        </div>
                     `;
                     massiveContainer.appendChild(card);
                 });
             }
 
-            // Videá bez reklám (youtube-nocookie)
+            // 2. Videá (Klikateľné náhľady, ktoré otvoria Frame lightbox)
             if (videoItems.length === 0) {
                 videosGrid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 3rem;">
@@ -788,27 +1218,28 @@
                 videoItems.forEach(item => {
                     const card = document.createElement("div");
                     card.className = "video-box";
-                    
-                    // Bez reklám a sledovania cez youtube-nocookie
-                    const embedUrl = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?rel=0&modestbranding=1&enablejsapi=1`;
+
+                    const canDelete = currentUser && (currentUser.id === item.authorId || currentUser.username === item.author || !item.authorId);
+                    const thumbUrl = `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg`;
 
                     card.innerHTML = `
-                        <div class="video-iframe-wrap">
-                            <iframe 
-                                src="${embedUrl}" 
-                                title="${escapeHtml(item.title)}" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="video-thumb-wrap" onclick="openVideoModal('${item.youtubeId}')">
+                            <img src="${thumbUrl}" class="video-thumb-img" alt="${escapeHtml(item.title)}">
+                            <div class="play-overlay">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
                         </div>
                         <div class="video-meta-box">
-                            <div>
+                            <div onclick="openVideoModal('${item.youtubeId}')">
                                 <h3 class="video-title">${escapeHtml(item.title)}</h3>
-                                <p class="video-desc">${escapeHtml(item.content || "Bez popisu.")}</p>
+                                <p class="video-desc">${escapeHtml(item.content || "Kliknite pre prehratie vo Frame...")}</p>
                             </div>
                             <div class="video-foot">
-                                <span>PUBLIC ARCHIVE</span>
-                                <span>${item.timestamp}</span>
+                                <span>${escapeHtml(item.author || "Verejný hosť")}</span>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span>${item.timestamp}</span>
+                                    ${canDelete ? `<button class="btn-delete" onclick="deleteItem('${item.id}')">Zmazať</button>` : ''}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -834,12 +1265,13 @@
         }
 
         // Lokálna záloha pri štarte
-        const cached = localStorage.getItem("dankermax_catalog");
-        if (cached) {
-            try {
-                catalog = JSON.parse(cached);
-                renderCatalog();
-            } catch (e) {}
+        const cachedCatalog = localStorage.getItem("dankermax_catalog");
+        if (cachedCatalog) {
+            try { catalog = JSON.parse(cachedCatalog); renderCatalog(); } catch (e) {}
+        }
+        const cachedUsers = localStorage.getItem("dankermax_users_registry");
+        if (cachedUsers) {
+            try { usersRegistry = JSON.parse(cachedUsers); } catch (e) {}
         }
     </script>
 </body>
